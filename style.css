@@ -1,0 +1,112 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 96vh;
+  background-color: #f4f4f4;
+  margin: 3px;
+  font-family: Arial, sans-serif;
+}
+
+.calculadora {
+  width: 800px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.pantalla {
+  background-color: #222;
+  color: #fff;
+  font-size: 2em;
+  padding: 20px;
+  text-align: right;
+  border-bottom: 2px solid #333;
+  box-sizing: border-box;
+  border-radius: 5px;
+  width: 100%;
+  height: 60px; /* Ajustar altura fija para evitar cambio de tamaño */
+  border-radius: 10px 10px 0 0; /* Mantener el borde redondeado */
+}
+
+.botonera {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+}
+
+button {
+  padding: 20px;
+  font-size: 1.5em;
+  border: none;
+  background-color: #444;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button.operator {
+  background-color: #ff9500;
+}
+
+button.clear {
+  background-color: #d9534f;
+}
+
+button.equals {
+  background-color: #5cb85c;
+}
+
+button:hover {
+  background-color: #555;
+}
+
+button.backspace {
+  background-color: #ffcc00;
+}
+
+button.asin {
+  background-color: #007bff;
+}
+
+
+button.acos {
+  background-color: #007bff;
+}
+
+
+button.atan {
+  background-color: #007bff;
+}
+
+
+button.sin {
+  background-color: #007bff;
+}
+
+
+button.cos {
+  background-color: #007bff;
+}
+
+
+button.tan {
+  background-color: #007bff;
+}
+
+
+
+button.modeToggle {
+  background-color: #6c757d;
+  color: #fff;
+  font-weight: bold;
+}
+
+button.scientific {
+  display: none; /* Ocultar los botones científicos por defecto */
+}
+
+.modo-cientifico button.scientific {
+  display: block; /* Mostrar botones científicos cuando el modo esté activo */
+}

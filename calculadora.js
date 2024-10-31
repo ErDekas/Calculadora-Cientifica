@@ -8,7 +8,8 @@ const LIMITE_CARACTERES = 30; // Establecer el límite de caracteres
 let valorEnPantalla = "";
 let enRadianes = true;
 let modoCientifico = true;
-let botonSeleccionado = 0;
+let historial = [];
+let indiceHistorial = -1;
 
 // Crear los botones de la calculadora dinámicamente
 botones.forEach((boton) => {
@@ -27,11 +28,13 @@ function manejarClick(texto, tipo) {
   switch (tipo) {
     case "clear":
       valorEnPantalla = "";
+      indiceHistorial = historial.length;
       break;
     case "equals":
       try {
-        // Evaluar la expresión y obtener el resultado
         const resultado = evaluarExpresion(valorEnPantalla);
+        historial.push(valorEnPantalla);
+        indiceHistorial = historial.length;
         valorEnPantalla = String(resultado); // Convertir resultado a string
       } catch (e) {
         valorEnPantalla = "Error"; // Manejar errores
@@ -41,28 +44,28 @@ function manejarClick(texto, tipo) {
       valorEnPantalla += "√";
       break;
     case "log":
-      valorEnPantalla += "log";
+      valorEnPantalla += "log(";
       break;
     case "ln":
-      valorEnPantalla += "ln";
+      valorEnPantalla += "ln(";
       break;
     case "sin":
-      valorEnPantalla += "sin";
+      valorEnPantalla += "sin(";
       break;
     case "cos":
-      valorEnPantalla += "cos";
+      valorEnPantalla += "cos(";
       break;
     case "tan":
-      valorEnPantalla += "tan";
+      valorEnPantalla += "tan(";
       break;
     case "asin":
-      valorEnPantalla += "asin";
+      valorEnPantalla += "asin(";
       break;
     case "acos":
-      valorEnPantalla += "acos";
+      valorEnPantalla += "acos(";
       break;
     case "atan":
-      valorEnPantalla += "atan";
+      valorEnPantalla += "atan(";
       break;
     case "power":
       valorEnPantalla += "**";
@@ -77,7 +80,7 @@ function manejarClick(texto, tipo) {
       valorEnPantalla += "10**";
       break;
     case "exp":
-      valorEnPantalla += "exp";
+      valorEnPantalla += "exp(";
       break;
     case "pi":
       valorEnPantalla += Math.PI;
@@ -86,10 +89,9 @@ function manejarClick(texto, tipo) {
       valorEnPantalla += "00";
       break;
     case "percent":
-      // Aquí está la modificación para que el botón % calcule el porcentaje instantáneamente
       try {
-        const expresionConvertida = convertirExpresion(valorEnPantalla);
-        valorEnPantalla = eval(expresionConvertida) / 100; // Calcula el porcentaje y actualiza valorEnPantalla
+        const expresionConvertida = valorEnPantalla;
+        valorEnPantalla = eval(expresionConvertida) / 100;
       } catch {
         valorEnPantalla = "Error";
       }
@@ -106,45 +108,67 @@ function manejarClick(texto, tipo) {
     case "toggleAngle":
       enRadianes = !enRadianes;
       pantalla.textContent = `${enRadianes ? "Rad" : "Deg"}`;
-      break;
+      return;
     case "modeToggle":
       modoCientifico = !modoCientifico;
       actualizarModo();
-      break;
+      return;
     case "factorial":
       valorEnPantalla += "!";
       break;
     default:
       if (valorEnPantalla.length < LIMITE_CARACTERES) {
-        valorEnPantalla += texto; // Agregar texto al valor en pantalla
+        valorEnPantalla += texto;
       }
       break;
   }
 
-  pantalla.textContent = valorEnPantalla; // Actualizar la pantalla
+  pantalla.textContent = valorEnPantalla;
 }
 
 // Función para evaluar expresiones matemáticas con soporte para funciones
 function evaluarExpresion(exp) {
-  // Asegurarse de que se manejen correctamente los paréntesis
-  exp = exp.replace(/√\((.*?)\)/g, 'Math.sqrt($1)'); // Raíz cuadrada
-  exp = exp.replace(/log\((.*?)\)/g, 'Math.log10($1)'); // Logaritmo en base 10
-  exp = exp.replace(/ln\((.*?)\)/g, 'Math.log($1)'); // Logaritmo natural
-  exp = exp.replace(/sin\((.*?)\)/g, enRadianes ? 'Math.sin($1)' : 'Math.sin($1 * Math.PI / 180)'); // Seno
-  exp = exp.replace(/cos\((.*?)\)/g, enRadianes ? 'Math.cos($1)' : 'Math.cos($1 * Math.PI / 180)'); // Coseno
-  exp = exp.replace(/tan\((.*?)\)/g, enRadianes ? 'Math.tan($1)' : 'Math.tan($1 * Math.PI / 180)'); // Tangente
-  exp = exp.replace(/asin\((.*?)\)/g, enRadianes ? 'Math.asin($1)' : 'Math.asin($1) * (180 / Math.PI)'); // Arco seno
-  exp = exp.replace(/acos\((.*?)\)/g, enRadianes ? 'Math.acos($1)' : 'Math.acos($1) * (180 / Math.PI)'); // Arco coseno
-  exp = exp.replace(/atan\((.*?)\)/g, enRadianes ? 'Math.atan($1)' : 'Math.atan($1) * (180 / Math.PI)'); // Arco tangente
-  exp = exp.replace(/pi/g, 'Math.PI'); // Pi
-  exp = exp.replace(/e/g, 'Math.E'); // Número de Euler
+  exp = exp
+    .replace(/√\((.*?)\)/g, "Math.sqrt($1)")
+    .replace(/√(\d+(\.\d+)?)/g, "Math.sqrt($1)")
+    .replace(/log\((.*?)\)/g, "Math.log10($1)")
+    .replace(/ln\((.*?)\)/g, "Math.log($1)")
+    .replace(
+      /sin\((.*?)\)/g,
+      enRadianes ? "Math.sin($1)" : "Math.sin($1 * Math.PI / 180)"
+    )
+    .replace(
+      /cos\((.*?)\)/g,
+      enRadianes ? "Math.cos($1)" : "Math.cos($1 * Math.PI / 180)"
+    )
+    .replace(
+      /tan\((.*?)\)/g,
+      enRadianes ? "Math.tan($1)" : "Math.tan($1 * Math.PI / 180)"
+    )
+    .replace(
+      /asin\((.*?)\)/g,
+      enRadianes ? "Math.asin($1)" : "Math.asin($1) * (180 / Math.PI)"
+    )
+    .replace(
+      /acos\((.*?)\)/g,
+      enRadianes ? "Math.acos($1)" : "Math.acos($1) * (180 / Math.PI)"
+    )
+    .replace(
+      /atan\((.*?)\)/g,
+      enRadianes ? "Math.atan($1)" : "Math.atan($1) * (180 / Math.PI)"
+    )
+    .replace(/pi/g, "Math.PI")
+    .replace(/e/g, "Math.E")
+    .replace(/(\d+(\.\d+)?)%/g, "($1/100)")
+    .replace(/\(([^()]+)\)%/g, "(($1)/100)")
+    .replace(/(\d+)!/g, (_, num) => factorial(parseInt(num))) // Calcular factorial
+    .replace(/\((.*?)\)!/g, (_, num) => factorial(parseInt(num))); // Calcular factorial
+  return Function(`"use strict"; return (${exp})`)();
 
-  // Evaluar la expresión
-  try {
-    return Function(`"use strict"; return (${exp})`)(); // Uso de Function para evaluar
-  } catch (error) {
-    throw new Error("Error al evaluar la expresión"); // Manejo de errores
-  }
+}
+
+function factorial(n){
+  return n <= 1 ? 1 : n * factorial(n-1);
 }
 
 // Función para alternar los botones del modo científico
@@ -176,13 +200,12 @@ function actualizarModo() {
   botones.forEach((boton) => {
     const buttonElement = document.querySelector(`button.${boton.type}`);
     if (botonesCientificos.includes(boton.type)) {
-      buttonElement.style.display = modoCientifico ? "block" : "none"; // Mostrar u ocultar botones
+      buttonElement.style.display = modoCientifico ? "block" : "none";
     }
   });
 
-  // Cambiar el texto del botón de modo
   const modoToggleButton = document.querySelector(`button.modeToggle`);
-  modoToggleButton.textContent = modoCientifico ? "Normal" : "Científica"; // Cambiar el texto según el modo
+  modoToggleButton.textContent = modoCientifico ? "Normal" : "Científica";
 }
 
 // Mapeo de teclas a botones de la calculadora
@@ -206,30 +229,41 @@ const teclaMapeo = {
   Backspace: "backspace",
   Escape: "clear",
   Tab: "modeToggle",
+  ArrowUp: "historyUp",
+  ArrowDown: "historyDown",
+  ")": ")",
+  "(": "(",
+  "%": "%",
+  "!": "!"
 };
 
 document.addEventListener("keydown", (event) => {
   const tecla = teclaMapeo[event.key];
   if (tecla) {
-    if (tecla === "equals") {
-      manejarClick("", "equals");
-    } else if (tecla === "clear") {
-      manejarClick("", "clear");
-    } else if (tecla === "backspace") {
-      manejarClick("", "backspace");
-    } else if (tecla === "modeToggle") {
-      manejarClick("", "modeToggle");
-    } else {
-      manejarClick(tecla, "number"); // Cambiar a 'number' o 'operator' según corresponda
-    }
-    event.preventDefault(); // Prevenir comportamiento predeterminado
-  }
-});
-
-// Asegurarse de que el input permita paréntesis
-document.addEventListener("keydown", (event) => {
-  if (event.key === "(" || event.key === ")") {
-    manejarClick(event.key, "number");
+    if (tecla === "equals") manejarClick("", "equals");
+    else if (tecla === "clear") manejarClick("", "clear");
+    else if (tecla === "backspace") manejarClick("", "backspace");
+    else if (tecla === "modeToggle") manejarClick("", "modeToggle");
+    else if (["historyUp", "historyDown"].includes(tecla)) {
+      manejarHistorial(tecla);
+    } else manejarClick(tecla, "number");
     event.preventDefault();
   }
 });
+
+// Función para manejar navegación en el historial
+function manejarHistorial(tecla) {
+  if (tecla === "historyUp" && indiceHistorial > 0) {
+    indiceHistorial--;
+    valorEnPantalla = historial[indiceHistorial];
+  } else if (tecla === "historyDown") {
+    if (indiceHistorial < historial.length - 1) {
+      indiceHistorial++;
+      valorEnPantalla = historial[indiceHistorial];
+    } else {
+      valorEnPantalla = "";
+      indiceHistorial = historial.length;
+    }
+  }
+  pantalla.textContent = valorEnPantalla;
+}

@@ -25,19 +25,23 @@ botones.forEach((boton) => {
 });
 
 function manejarClick(texto, tipo) {
+  if (!modoCientifico && (texto === '(' || texto === ')' || texto === '!')) {
+    return; // No hacer nada en modo normal si se presionan estos botones
+  }
+
   switch (tipo) {
     case "clear":
       valorEnPantalla = "";
-      indiceHistorial = historial.length;
+      indiceHistorial = historial.length; // Establecer índice en la última operación
       break;
     case "equals":
       try {
         const resultado = evaluarExpresion(valorEnPantalla);
         historial.push(valorEnPantalla);
         indiceHistorial = historial.length;
-        valorEnPantalla = String(resultado); // Convertir resultado a string
+        valorEnPantalla = String(resultado);
       } catch (e) {
-        valorEnPantalla = "Error"; // Manejar errores
+        valorEnPantalla = "Error";
       }
       break;
     case "sqrt":
@@ -108,22 +112,22 @@ function manejarClick(texto, tipo) {
     case "toggleAngle":
       enRadianes = !enRadianes;
       pantalla.textContent = `${enRadianes ? "Rad" : "Deg"}`;
-      return;
+      break;
     case "modeToggle":
       modoCientifico = !modoCientifico;
       actualizarModo();
-      return;
+      break;
     case "factorial":
       valorEnPantalla += "!";
       break;
     default:
       if (valorEnPantalla.length < LIMITE_CARACTERES) {
-        valorEnPantalla += texto;
+        valorEnPantalla += texto; // Agregar texto al valor en pantalla
       }
       break;
   }
 
-  pantalla.textContent = valorEnPantalla;
+  pantalla.textContent = valorEnPantalla; // Actualizar la pantalla
 }
 
 // Función para evaluar expresiones matemáticas con soporte para funciones
@@ -161,14 +165,20 @@ function evaluarExpresion(exp) {
     .replace(/e/g, "Math.E")
     .replace(/(\d+(\.\d+)?)%/g, "($1/100)")
     .replace(/\(([^()]+)\)%/g, "(($1)/100)")
-    .replace(/(\d+)!/g, (_, num) => factorial(parseInt(num))) // Calcular factorial
-    .replace(/\((.*?)\)!/g, (_, num) => factorial(parseInt(num))); // Calcular factorial
+    .replace(/(\d+(\.\d+)?)!/g, (_, num) => factorial(parseInt(num)))
+    .replace(/\(([^()]+)\)!/g, (_, num) => factorial(parseInt(num)))
   return Function(`"use strict"; return (${exp})`)();
-
 }
 
-function factorial(n){
-  return n <= 1 ? 1 : n * factorial(n-1);
+// Función para calcular el factorial
+function factorial(n) {
+  if (n < 0) return NaN; // Factorial no definido para números negativos
+  if (n === 0 || n === 1) return 1; // Factorial de 0 y 1 es 1
+  let resultado = 1;
+  for (let i = 2; i <= n; i++) {
+    resultado *= i;
+  }
+  return resultado;
 }
 
 // Función para alternar los botones del modo científico
@@ -234,22 +244,34 @@ const teclaMapeo = {
   ")": ")",
   "(": "(",
   "%": "%",
-  "!": "!"
+  "!": "!",
 };
 
 document.addEventListener("keydown", (event) => {
   const tecla = teclaMapeo[event.key];
+  
+  // Deshabilitar entrada de paréntesis y factorial en modo normal
+  if (!modoCientifico && (event.key === '(' || event.key === ')' || event.key === '!')) {
+    event.preventDefault(); // Prevenir comportamiento predeterminado
+    return; // No hacer nada más
+  }
+
   if (tecla) {
-    if (tecla === "equals") manejarClick("", "equals");
-    else if (tecla === "clear") manejarClick("", "clear");
-    else if (tecla === "backspace") manejarClick("", "backspace");
-    else if (tecla === "modeToggle") manejarClick("", "modeToggle");
-    else if (["historyUp", "historyDown"].includes(tecla)) {
+    if (tecla === "equals") {
+      manejarClick("", "equals");
+    } else if (tecla === "clear") {
+      manejarClick("", "clear");
+    } else if (tecla === "backspace") {
+      manejarClick("", "backspace");
+    } else if (tecla === "modeToggle") {
+      manejarClick("", "modeToggle");
+    } else if (["historyUp", "historyDown"].includes(tecla)) {
       manejarHistorial(tecla);
     } else manejarClick(tecla, "number");
     event.preventDefault();
   }
 });
+
 
 // Función para manejar navegación en el historial
 function manejarHistorial(tecla) {

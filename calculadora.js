@@ -151,34 +151,31 @@ function evaluarExpresion(exp) {
     )
     .replace(
       /asin\((.*?)\)/g,
-      enRadianes ? "Math.asin($1)" : "Math.asin($1) * (180 / Math.PI)"
+      enRadianes ? "Math.sin($1)**-1" : "(Math.sin($1)**-1) * (180 / Math.PI)"
     )
     .replace(
       /acos\((.*?)\)/g,
-      enRadianes ? "Math.acos($1)" : "Math.acos($1) * (180 / Math.PI)"
+      enRadianes ? "Math.cos($1)**-1" : "(Math.cos($1)**-1) * (180 / Math.PI)"
     )
     .replace(
       /atan\((.*?)\)/g,
-      enRadianes ? "Math.atan($1)" : "Math.atan($1) * (180 / Math.PI)"
+      enRadianes ? "Math.tan($1)**-1" : "(Math.tan($1)**-1) * (180 / Math.PI)"
     )
     .replace(/pi/g, "Math.PI")
     .replace(/e/g, "Math.E")
+    .replace(/exp\((.*?)\)/g, "Math.exp($1)")  // Añadido: función exponencial exp(x)
     .replace(/(\d+(\.\d+)?)%/g, "($1/100)")
     .replace(/\(([^()]+)\)%/g, "(($1)/100)")
-    .replace(/(\d+(\.\d+)?)!/g, (_, num) => factorial(parseInt(num)))
-    .replace(/\(([^()]+)\)!/g, (_, num) => factorial(parseInt(num)))
+    .replace(/\((.*?)\)!/g, (_, expr) => factorial(evaluarExpresion(expr)))  // Factorial de una expresión
+    .replace(/(\d+)!/g, (_, num) => factorial(parseInt(num)));  // Factorial de un número
   return Function(`"use strict"; return (${exp})`)();
 }
 
 // Función para calcular el factorial
 function factorial(n) {
-  if (n < 0) return NaN; // Factorial no definido para números negativos
-  if (n === 0 || n === 1) return 1; // Factorial de 0 y 1 es 1
-  let resultado = 1;
-  for (let i = 2; i <= n; i++) {
-    resultado *= i;
-  }
-  return resultado;
+  if (n < 0) return NaN;
+  if (n === 0 || n === 1) return 1;
+  return Array.from({ length: n }, (_, i) => i + 1).reduce((a, b) => a * b, 1);
 }
 
 // Función para alternar los botones del modo científico

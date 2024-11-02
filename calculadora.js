@@ -25,7 +25,7 @@ botones.forEach((boton) => {
 });
 
 function manejarClick(texto, tipo) {
-  if (!modoCientifico && (texto === '(' || texto === ')' || texto === '!')) {
+  if (!modoCientifico && (texto === "(" || texto === ")" || texto === "!")) {
     return; // No hacer nada en modo normal si se presionan estos botones
   }
 
@@ -63,13 +63,13 @@ function manejarClick(texto, tipo) {
       valorEnPantalla += "tan(";
       break;
     case "asin":
-      valorEnPantalla += "asin(";
+      valorEnPantalla += "sin⁻¹(";
       break;
     case "acos":
-      valorEnPantalla += "acos(";
+      valorEnPantalla += "cos⁻¹(";
       break;
     case "atan":
-      valorEnPantalla += "atan(";
+      valorEnPantalla += "tan⁻¹(";
       break;
     case "power":
       valorEnPantalla += "**";
@@ -84,7 +84,7 @@ function manejarClick(texto, tipo) {
       valorEnPantalla += "10**";
       break;
     case "exp":
-      valorEnPantalla += "exp(";
+      valorEnPantalla += "e**(";
       break;
     case "pi":
       valorEnPantalla += Math.PI;
@@ -111,7 +111,7 @@ function manejarClick(texto, tipo) {
       break;
     case "toggleAngle":
       enRadianes = !enRadianes;
-      pantalla.textContent = `${enRadianes ? "Rad" : "Deg"}`;
+      actualizarTextoBotonAngulo(); // Llamar a la función para actualizar el texto del botón
       break;
     case "modeToggle":
       modoCientifico = !modoCientifico;
@@ -137,37 +137,31 @@ function evaluarExpresion(exp) {
     .replace(/√(\d+(\.\d+)?)/g, "Math.sqrt($1)")
     .replace(/log\((.*?)\)/g, "Math.log10($1)")
     .replace(/ln\((.*?)\)/g, "Math.log($1)")
-    .replace(
-      /sin\((.*?)\)/g,
-      enRadianes ? "Math.sin($1)" : "Math.sin($1 * Math.PI / 180)"
+    .replace(/sin\((.*?)\)/g, (_, valor) =>
+      convertirSin(evaluarExpresion(valor))
     )
-    .replace(
-      /cos\((.*?)\)/g,
-      enRadianes ? "Math.cos($1)" : "Math.cos($1 * Math.PI / 180)"
+    .replace(/cos\((.*?)\)/g, (_, valor) =>
+      convertirCos(evaluarExpresion(valor))
     )
-    .replace(
-      /tan\((.*?)\)/g,
-      enRadianes ? "Math.tan($1)" : "Math.tan($1 * Math.PI / 180)"
+    .replace(/tan\((.*?)\)/g, (_, valor) =>
+      convertirTan(evaluarExpresion(valor))
     )
-    .replace(
-      /asin\((.*?)\)/g,
-      enRadianes ? "Math.sin($1)**-1" : "(Math.sin($1)**-1) * (180 / Math.PI)"
+    .replace(/sin⁻¹\((.*?)\)/g, (_, valor) =>
+      convertirAsin(evaluarExpresion(valor))
     )
-    .replace(
-      /acos\((.*?)\)/g,
-      enRadianes ? "Math.cos($1)**-1" : "(Math.cos($1)**-1) * (180 / Math.PI)"
+    .replace(/cos⁻¹\((.*?)\)/g, (_, valor) =>
+      convertirAcos(evaluarExpresion(valor))
     )
-    .replace(
-      /atan\((.*?)\)/g,
-      enRadianes ? "Math.tan($1)**-1" : "(Math.tan($1)**-1) * (180 / Math.PI)"
+    .replace(/tan⁻¹\((.*?)\)/g, (_, valor) =>
+      convertirAtan(evaluarExpresion(valor))
     )
     .replace(/pi/g, "Math.PI")
     .replace(/e/g, "Math.E")
-    .replace(/exp\((.*?)\)/g, "Math.exp($1)")  // Añadido: función exponencial exp(x)
+    .replace(/exp\((.*?)\)/g, "Math.exp($1)")
     .replace(/(\d+(\.\d+)?)%/g, "($1/100)")
     .replace(/\(([^()]+)\)%/g, "(($1)/100)")
-    .replace(/\((.*?)\)!/g, (_, expr) => factorial(evaluarExpresion(expr)))  // Factorial de una expresión
-    .replace(/(\d+)!/g, (_, num) => factorial(parseInt(num)));  // Factorial de un número
+    .replace(/\((.*?)\)!/g, (_, expr) => factorial(evaluarExpresion(expr))) // Factorial de una expresión
+    .replace(/(\d+)!/g, (_, num) => factorial(parseInt(num))); // Factorial de un número
   return Function(`"use strict"; return (${exp})`)();
 }
 
@@ -176,6 +170,32 @@ function factorial(n) {
   if (n < 0) return NaN;
   if (n === 0 || n === 1) return 1;
   return Array.from({ length: n }, (_, i) => i + 1).reduce((a, b) => a * b, 1);
+}
+
+function convertirSin(valor) {
+  return enRadianes ? Math.sin(valor) : Math.sin((valor * Math.PI) / 180);
+}
+
+function convertirCos(valor) {
+  return enRadianes ? Math.cos(valor) : Math.cos((valor * Math.PI) / 180);
+}
+
+function convertirTan(valor) {
+  return enRadianes ? Math.tan(valor) : Math.tan((valor * Math.PI) / 180);
+}
+
+function convertirAsin(valor) {
+  if (valor < -1 || valor > 1) return NaN; // Validación de dominio
+  return enRadianes ? Math.asin(valor) : (Math.asin(valor) * 180) / Math.PI;
+}
+
+function convertirAcos(valor) {
+  if (valor < -1 || valor > 1) return NaN; // Validación de dominio
+  return enRadianes ? Math.acos(valor) : (Math.acos(valor) * 180) / Math.PI;
+}
+
+function convertirAtan(valor) {
+  return enRadianes ? Math.atan(valor) : (Math.atan(valor) * 180) / Math.PI;
 }
 
 // Función para alternar los botones del modo científico
@@ -215,6 +235,15 @@ function actualizarModo() {
   modoToggleButton.textContent = modoCientifico ? "Normal" : "Científica";
 }
 
+// Función para actualizar el texto del botón de grados/radianes
+function actualizarTextoBotonAngulo() {
+  const botonAngulo = document.querySelector(`button.toggleAngle`);
+  botonAngulo.textContent = enRadianes ? "Grados" : "Radianes"; // Cambiar texto según el estado
+}
+
+// Llamada inicial para establecer el texto del botón al cargar
+actualizarTextoBotonAngulo();
+
 // Mapeo de teclas a botones de la calculadora
 const teclaMapeo = {
   0: "0",
@@ -246,9 +275,12 @@ const teclaMapeo = {
 
 document.addEventListener("keydown", (event) => {
   const tecla = teclaMapeo[event.key];
-  
+
   // Deshabilitar entrada de paréntesis y factorial en modo normal
-  if (!modoCientifico && (event.key === '(' || event.key === ')' || event.key === '!')) {
+  if (
+    !modoCientifico &&
+    (event.key === "(" || event.key === ")" || event.key === "!")
+  ) {
     event.preventDefault(); // Prevenir comportamiento predeterminado
     return; // No hacer nada más
   }
@@ -268,7 +300,6 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
   }
 });
-
 
 // Función para manejar navegación en el historial
 function manejarHistorial(tecla) {

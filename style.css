@@ -1,15 +1,17 @@
+/* Base del diseño */
 body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 96vh;
+  height: 98vh;
   background-color: #f4f4f4;
   margin: 3px;
   font-family: Arial, sans-serif;
 }
 
 .calculadora {
-  width: 800px;
+  width: 100%;
+  max-width: 800px;
   border: 2px solid #333;
   border-radius: 10px;
   overflow: hidden;
@@ -19,15 +21,14 @@ body {
 .pantalla {
   background-color: #222;
   color: #fff;
-  font-size: 2em;
-  padding: 20px;
+  font-size: 1.8em;
+  padding: 15px;
   text-align: right;
   border-bottom: 2px solid #333;
-  box-sizing: border-box;
-  border-radius: 5px;
-  width: 100%;
-  height: 60px; /* Ajustar altura fija para evitar cambio de tamaño */
-  border-radius: 10px 10px 0 0; /* Mantener el borde redondeado */
+  border-radius: 10px 10px 0 0;
+  height: 35px; /* Altura reducida para asegurar que las esquinas redondeadas se vean */
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .botonera {
@@ -36,6 +37,7 @@ body {
   gap: 1px;
 }
 
+/* Estilos de los botones */
 button {
   padding: 20px;
   font-size: 1.5em;
@@ -66,36 +68,14 @@ button.backspace {
   background-color: #ffcc00;
 }
 
-button.asin {
-  background-color: #007bff;
-}
-
-
-button.acos {
-  background-color: #007bff;
-}
-
-
-button.atan {
-  background-color: #007bff;
-}
-
-
-button.sin {
-  background-color: #007bff;
-}
-
-
-button.cos {
-  background-color: #007bff;
-}
-
-
+button.asin,
+button.acos,
+button.atan,
+button.sin,
+button.cos,
 button.tan {
   background-color: #007bff;
 }
-
-
 
 button.modeToggle {
   background-color: #6c757d;
@@ -104,9 +84,56 @@ button.modeToggle {
 }
 
 button.scientific {
-  display: none; /* Ocultar los botones científicos por defecto */
+  display: none;
 }
 
 .modo-cientifico button.scientific {
-  display: block; /* Mostrar botones científicos cuando el modo esté activo */
+  display: block;
+}
+
+/* Responsividad para pantallas medianas */
+@media (max-width: 768px) {
+  .calculadora {
+    width: 90%;
+    max-width: 500px;
+  }
+
+  .pantalla {
+    font-size: 1.5em;
+    padding: 10px;
+    height: 45px; /* Ajustar altura en pantallas medianas */
+  }
+
+  button {
+    font-size: 1.2em;
+    padding: 15px;
+  }
+
+  .botonera {
+    gap: 1px;
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 480px) {
+  .calculadora {
+    width: 95%;
+  }
+
+  .pantalla {
+    font-size: 1.3em;
+    padding: 8px;
+    height: 40px; /* Reducir altura en pantallas pequeñas */
+  }
+
+  .botonera {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+  }
+
+  button {
+    font-size: 1em;
+    padding: 10px;
+  }
 }

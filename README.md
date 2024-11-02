@@ -36,7 +36,7 @@ open index.html
 calculadora-cientifica/
 │
 ├── index.html          # Archivo principal de la aplicación
-├── styles.css          # Estilos CSS para la calculadora
+├── style.css          # Estilos CSS para la calculadora
 ├── calculadora.js           # Lógica JavaScript de la calculadora
 ├── botones.js          # Botones de la calculadora
 └── visual.png          # Captura de pantalla de la calculadora

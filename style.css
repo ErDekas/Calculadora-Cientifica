@@ -3,30 +3,33 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 98vh;
+  height: 100vh; /* Ocupa el 100% de la altura de la ventana */
   background-color: #f4f4f4;
-  margin: 3px;
+  margin: 0; /* Eliminado margen para evitar recortes */
   font-family: Arial, sans-serif;
 }
 
 .calculadora {
-  width: 100%;
+  width: 90%; /* Ajustado a un 90% del ancho de la pantalla */
   max-width: 800px;
+  height: 70vh; /* Ajustado para que ocupe un 70% de la altura de la ventana */
   border: 2px solid #333;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column; /* Para apilar pantalla y botones verticalmente */
 }
 
 .pantalla {
   background-color: #222;
   color: #fff;
-  font-size: 1.8em;
-  padding: 15px;
+  font-size: 2em; /* Aumentar el tamaño de la fuente */
+  padding: 10px; /* Ajuste de padding */
   text-align: right;
   border-bottom: 2px solid #333;
   border-radius: 10px 10px 0 0;
-  height: 35px; /* Altura reducida para asegurar que las esquinas redondeadas se vean */
+  height: 20%; /* Ajustar altura a un 20% del contenedor */
   overflow-x: auto;
   white-space: nowrap;
 }
@@ -35,17 +38,19 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
+  flex-grow: 1; /* Permitir que la botonera ocupe el espacio restante */
 }
 
 /* Estilos de los botones */
 button {
-  padding: 20px;
-  font-size: 1.5em;
+  padding: 5px; /* Ajustado para evitar desbordamiento */
+  font-size: 1.5em; /* Mantener un tamaño adecuado */
   border: none;
   background-color: #444;
   color: white;
   cursor: pointer;
   transition: background-color 0.3s;
+  height: 100%; /* Hacer que los botones llenen su celda */
 }
 
 button.operator {
@@ -84,34 +89,32 @@ button.modeToggle {
 }
 
 button.scientific {
-  display: none;
+  display: none; /* Inicialmente ocultar */
 }
 
 .modo-cientifico button.scientific {
-  display: block;
+  display: block; /* Mostrar solo en modo científico */
 }
 
 /* Responsividad para pantallas medianas */
 @media (max-width: 768px) {
   .calculadora {
     width: 90%;
-    max-width: 500px;
+    height: 75vh; /* Ajuste ligero de la altura */
   }
 
   .pantalla {
     font-size: 1.5em;
     padding: 10px;
-    height: 45px; /* Ajustar altura en pantallas medianas */
+    height: 20%; /* Mantener altura ajustada */
   }
 
   button {
     font-size: 1.2em;
-    padding: 15px;
   }
 
   .botonera {
     gap: 1px;
-    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -119,21 +122,36 @@ button.scientific {
 @media (max-width: 480px) {
   .calculadora {
     width: 95%;
+    height: 80vh; /* Aumentar la altura en pantallas pequeñas */
   }
 
   .pantalla {
     font-size: 1.3em;
     padding: 8px;
-    height: 40px; /* Reducir altura en pantallas pequeñas */
+    height: 20%; /* Mantener proporcionalidad */
   }
 
   .botonera {
-    grid-template-columns: repeat(4, 1fr);
     gap: 2px;
+    grid-template-columns: repeat(4, 1fr);
   }
 
   button {
     font-size: 1em;
-    padding: 10px;
+    padding: 5px; /* Reducir padding para que no desborde */
   }
+}
+
+/* Ajustes en modo científico */
+.modo-cientifico .pantalla {
+  height: 20%; /* Ajustar altura de la pantalla en modo científico */
+}
+
+.modo-cientifico .botonera {
+  grid-template-columns: repeat(4, 1fr); /* Asegurarse de que los botones se alineen bien */
+}
+
+.modo-cientifico button {
+  font-size: 1em; /* Ajustar tamaño de fuente para botones científicos */
+  padding: 5px; /* Ajuste de padding para botones científicos */
 }
